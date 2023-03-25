@@ -11,13 +11,14 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.example.arifrahman_mandiri_test_movie_app.R
 
 class MoviesAdapter(
-    private var movies: MutableList<Movie>
+    private var movies: MutableList<Movie>,
+    private val onMovieClick: (movie: Movie) -> Unit
 ) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
         val view = LayoutInflater
             .from(parent.context)
-            .inflate(R.layout.item_movie, parent, false)
+                .inflate(R.layout.item_movie, parent, false)
         return MovieViewHolder(view)
     }
 
@@ -50,6 +51,7 @@ class MoviesAdapter(
                 .load("https://image.tmdb.org/t/p/w154${movie.posterPath}")
                 .transform(CenterCrop())
                 .into(poster)
+            itemView.setOnClickListener { onMovieClick.invoke(movie) }
 
         }
 

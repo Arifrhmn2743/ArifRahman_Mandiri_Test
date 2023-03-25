@@ -26,16 +26,19 @@ object GenreRepository {
 
         api.getGenre()
             .enqueue(object :Callback<GetGenreResponse>{
+
                 override fun onResponse(
                     call: Call<GetGenreResponse>,
                     response: Response<GetGenreResponse>
+
                 ) {
+
                     if (response.isSuccessful) {
                         val responseBody = response.body()
 
                         if (responseBody != null) {
-                            onSuccess.invoke(responseBody.genre)
-                            Log.d("Repository", "genre: ${responseBody.genre}")
+                            onSuccess.invoke(responseBody.genres)
+                            Log.d("Repository", "genre: ${responseBody.genres}")
                         } else {
                             onError.invoke()
                         }

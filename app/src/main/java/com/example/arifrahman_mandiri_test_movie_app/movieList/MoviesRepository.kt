@@ -20,10 +20,11 @@ object MoviesRepository { private val api: Api
 
     fun getPopularMovies(
         page: Int = 1,
+
         onSuccess: (movies: List<Movie>) -> Unit,
         onError: () -> Unit
     ) {
-        api.getPopularMovies(page = page)
+        api.getPopularMovies(page = page, with_genres = 28)
             .enqueue(object : Callback<GetMovieResponse> {
                 override fun onResponse(
                     call: Call<GetMovieResponse>,

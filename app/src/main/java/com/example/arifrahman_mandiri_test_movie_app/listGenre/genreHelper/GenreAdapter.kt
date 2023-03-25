@@ -23,9 +23,7 @@ class GenreAdapter (
     }
 
     override fun onBindViewHolder(holder: GenreViewHolder, position: Int) {
-        var items =genre[position]
-
-        holder.bind(items)
+      holder.movieName.text=genre.get(position).name
     }
 
     override fun getItemCount(): Int = genre.size
@@ -38,23 +36,9 @@ class GenreAdapter (
     }
 
     inner class GenreViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+         val movieName: TextView = itemView.findViewById(R.id.genre_tv)
 
 
-        fun bind(items: Genre) {
-
-        }
-
-
-//        private val poster: ImageView = itemView.findViewById(R.id.item_movie_poster)
-////        private val movieName: TextView = itemView.findViewById(R.id.item_movie_poster_text)
-//
-//        fun bind(movie: Movie) {
-//            Glide.with(itemView)
-//                .load("https://image.tmdb.org/t/p/w154${movie.posterPath}")
-//                .transform(CenterCrop())
-//                .into(poster)
-////            movieName=movie.title
-//        }
 
     }
 }
