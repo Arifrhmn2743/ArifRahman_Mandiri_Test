@@ -42,7 +42,7 @@ class MoviesAdapter(
                 .load("https://image.tmdb.org/t/p/w154${movie.posterPath}")
                 .transform(CenterCrop())
                 .into(poster)
-//            movieName=movie.title
+
         }
 
     }
