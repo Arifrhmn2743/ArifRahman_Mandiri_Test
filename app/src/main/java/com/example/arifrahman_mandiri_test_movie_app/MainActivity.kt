@@ -16,6 +16,8 @@ import com.example.arifrahman_mandiri_test_movie_app.movieList.MoviesRepository
 class MainActivity : AppCompatActivity() {
     private lateinit var popularMovies: RecyclerView
     private lateinit var popularMoviesAdapter: MoviesAdapter
+    private lateinit var popularMoviesLayoutMgr: LinearLayoutManager
+    private var popularMoviesPage = 1
     private lateinit var genreMovies: RecyclerView
     private lateinit var genreAdapter: GenreAdapter
 
@@ -23,11 +25,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         popularMovies = findViewById(R.id.popular_movies)
-        popularMovies.layoutManager = LinearLayoutManager(
+
+        popularMoviesLayoutMgr = LinearLayoutManager(
             this,
-            LinearLayoutManager.VERTICAL,
+            LinearLayoutManager.HORIZONTAL,
             false
         )
+        popularMovies.layoutManager = popularMoviesLayoutMgr
 //        genreMovies = findViewById(R.id.list_genre)
 //        genreMovies.layoutManager = LinearLayoutManager(
 //            this,
@@ -36,21 +40,45 @@ class MainActivity : AppCompatActivity() {
 //        )
 //        genreAdapter= GenreAdapter(listOf())
 //        genreMovies.adapter=genreAdapter
-        popularMoviesAdapter = MoviesAdapter(listOf())
+
+        popularMoviesAdapter = MoviesAdapter(mutableListOf())
         popularMovies.adapter = popularMoviesAdapter
+
+        getPopularMovies()
 
         MoviesRepository.getPopularMovies(onError = ::onError, onSuccess = ::onPopularMoviesFetched)
 //        GenreRepository.getGenre(onError = ::onError, onSuccess = ::onGenreMoviesFetched)
     }
 
     private fun onPopularMoviesFetched(list: List<Movie>) {
-        popularMoviesAdapter.updateMovies(list)
-
+        popularMoviesAdapter.appendMovies(list)
+        attachPopularMoviesOnScrollListener()
     }
+
+    private fun attachPopularMoviesOnScrollListener() {
+        popularMovies.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                val totalItemCount = popularMoviesLayoutMgr.itemCount
+                18
+                val visibleItemCount = popularMoviesLayoutMgr.childCount
+                val firstVisibleItem = popularMoviesLayoutMgr.findFirstVisibleItemPosition()
+                if (firstVisibleItem + visibleItemCount >= totalItemCount / 2) {
+                    popularMovies.removeOnScrollListener(this)
+                    popularMoviesPage++
+                    getPopularMovies()
+                } }
+        }) }
 //    private fun onGenreMoviesFetched(list: List<Genre>) {
 //        genreAdapter.updateGenre(list)
 //
 //    }
+
+    private fun getPopularMovies() {
+        MoviesRepository.getPopularMovies(
+            popularMoviesPage,
+            ::onPopularMoviesFetched,
+            ::onError
+        ) }
 
     private fun onError() {
         Toast.makeText(this, getString(R.string.error_fetch_movies), Toast.LENGTH_SHORT).show()
