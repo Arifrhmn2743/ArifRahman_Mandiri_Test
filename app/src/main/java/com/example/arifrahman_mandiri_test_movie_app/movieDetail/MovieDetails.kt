@@ -2,18 +2,28 @@ package com.example.arifrahman_mandiri_test_movie_app.movieDetail
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
+import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.example.arifrahman_mandiri_test_movie_app.R
+import com.example.arifrahman_mandiri_test_movie_app.movieDetail.DetailHelper.MovieTrailer
+import com.example.arifrahman_mandiri_test_movie_app.movieDetail.DetailHelper.VideoAdapter
+import com.example.arifrahman_mandiri_test_movie_app.movieDetail.DetailHelper.VideoRepository
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+
 const val MOVIE_BACKDROP = "extra_movie_backdrop"
 const val MOVIE_POSTER = "extra_movie_poster"
 const val MOVIE_TITLE = "extra_movie_title"
 const val MOVIE_RATING = "extra_movie_rating"
 const val MOVIE_RELEASE_DATE = "extra_movie_release_date"
 const val MOVIE_OVERVIEW = "extra_movie_overview"
+const val MOVIE_ID = "extra_movie_id"
 
 class MovieDetails : AppCompatActivity() {
     private lateinit var backdrop: ImageView
@@ -22,6 +32,9 @@ class MovieDetails : AppCompatActivity() {
     private lateinit var rating: RatingBar
     private lateinit var releaseDate: TextView
     private lateinit var overview: TextView
+    private lateinit var video: RecyclerView
+    private lateinit var videoAdapter: VideoAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +45,15 @@ class MovieDetails : AppCompatActivity() {
         rating = findViewById(R.id.movie_rating)
         releaseDate = findViewById(R.id.movie_release_date)
         overview = findViewById(R.id.movie_overview)
+        video = findViewById(R.id.video_trailer)
+
+        videoAdapter = VideoAdapter(listOf())
+        video.adapter = videoAdapter
+        video.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+
+
+        getTrailer()
+
 
         val extras = intent.extras
         if (extras != null) {
@@ -40,6 +62,7 @@ class MovieDetails : AppCompatActivity() {
             finish()
         }
     }
+
     private fun populateDetails(extras: Bundle) {
         extras.getString(MOVIE_BACKDROP)?.let { backdropPath ->
             Glide.with(this)
@@ -57,5 +80,32 @@ class MovieDetails : AppCompatActivity() {
         rating.rating = extras.getFloat(MOVIE_RATING, 0f) / 2
         releaseDate.text = extras.getString(MOVIE_RELEASE_DATE, "")
         overview.text = extras.getString(MOVIE_OVERVIEW, "")
+        Log.d("Repository", "genre: ${extras.getLong(MOVIE_ID)}")
+
+    }
+
+    private fun onTrailerFetch(list: List<MovieTrailer>) {
+        videoAdapter.updateVideo(list)
+    }
+
+    private fun getTrailer() {
+        val extras = intent.extras
+        if (extras != null) {
+            populateDetails(extras)
+        } else {
+            finish()
+        }
+        if (extras != null) {
+            VideoRepository.getVideoTrailer(
+                extras.getLong(MOVIE_ID).toInt(),
+                "en-US",
+                ::onTrailerFetch,
+                ::onError
+            )
+        }
+    }
+
+    private fun onError() {
+        Toast.makeText(this, getString(R.string.error_fetch_movies), Toast.LENGTH_SHORT).show()
     }
 }
