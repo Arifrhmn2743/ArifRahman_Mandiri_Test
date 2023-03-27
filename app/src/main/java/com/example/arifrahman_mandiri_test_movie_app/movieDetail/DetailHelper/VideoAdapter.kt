@@ -20,7 +20,7 @@ class VideoAdapter (
             video.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
                 override fun onReady(youTubePlayer: YouTubePlayer) {
                     val videoId = movieTrailer.key
-                    youTubePlayer.loadVideo(videoId, 0f)
+                    youTubePlayer.cueVideo(videoId,0f)
                 }
             })
         }
